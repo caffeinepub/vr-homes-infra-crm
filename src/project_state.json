@@ -1,0 +1,476 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 53,
+  "summary": "Build “VR Homes Infra CRM” with distinct Admin and Agent dashboards, RBAC, agent self-registration (mobile/email/face) requiring admin approval, mandatory face authentication at both registration and login, and modules for customers, leads, follow-ups (including overdue automation), attendance (live location + face), WhatsApp actions (with admin visibility into agent chats/call activity), settings (theme + Hindi/English), admin agent management (approve/reject, edit/delete), and basic admin reporting with CSV export; stabilize startup/loading and production deployment.",
+  "existing_features": [
+    {
+      "id": "IF-1",
+      "title": "Backend role-based access control and authorization layer",
+      "synonyms": [
+        "RBAC",
+        "authorization"
+      ],
+      "description": "Introduced backend authorization/access-control modules to support role-based routing and permissions for Admin vs Agent experiences.",
+      "reqIds": [
+        "REQ-2",
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-2",
+      "title": "Shared Auth page with Admin login and Agent registration/login flows",
+      "synonyms": [
+        "unified auth",
+        "shared login"
+      ],
+      "description": "Frontend AuthPage with LoginForm and RegisterForm, using a single entry point for both roles.",
+      "reqIds": [
+        "REQ-3",
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-3",
+      "title": "Agent face-image capture component for onboarding/profile setup",
+      "synonyms": [
+        "face capture",
+        "camera capture"
+      ],
+      "description": "Camera capture/upload flow implemented via CameraCapture/useCamera and profile setup modal to collect face image during onboarding.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-4",
+      "title": "Agent approval workflow UI (pending/approved agent lists)",
+      "synonyms": [
+        "admin approval",
+        "user approval"
+      ],
+      "description": "Implemented agent approval workflow scaffolding including PendingAgentsList and ApprovedAgentsList, backed by user-approval backend module changes.",
+      "reqIds": [
+        "REQ-19",
+        "REQ-5",
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-5",
+      "title": "Admin and Agent dashboard pages with role-specific panel components",
+      "synonyms": [
+        "dashboards",
+        "role-based navigation"
+      ],
+      "description": "Created AdminDashboard and AgentDashboard pages and role-specific module components (customers, leads, follow-ups, WhatsApp).",
+      "reqIds": [
+        "REQ-1",
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-6",
+      "title": "Customers module UI for Admin and Agent",
+      "synonyms": [
+        "customer management"
+      ],
+      "description": "Implemented customer list/views and add customer dialog for Admin and Agent (AdminCustomersList, AgentCustomersList, AdminAddCustomerDialog).",
+      "reqIds": [
+        "REQ-6",
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-7",
+      "title": "Leads module UI (Admin/Agent lists and add lead dialog)",
+      "synonyms": [
+        "lead management"
+      ],
+      "description": "Implemented leads list panels (AdminLeadsList, AgentLeadsList) and AdminAddLeadDialog UI scaffolding.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-8",
+      "title": "Follow-ups module UI for Admin and Agent",
+      "synonyms": [
+        "follow ups"
+      ],
+      "description": "Implemented follow-up list panels for Admin and Agent (AdminFollowUpsList, AgentFollowUpsList).",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-9",
+      "title": "WhatsApp and calling actions UI panels",
+      "synonyms": [
+        "wa.me",
+        "tel links"
+      ],
+      "description": "Implemented AdminWhatsAppPanel and AgentWhatsAppPanel to support WhatsApp/call actions from within the app UI.",
+      "reqIds": [
+        "REQ-10",
+        "REQ-27",
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-10",
+      "title": "Admin Overview panel with module summary cards and quick navigation",
+      "synonyms": [
+        "admin overview",
+        "overview dashboard cards"
+      ],
+      "description": "Implemented an AdminOverviewPanel that summarizes key module counts/sections and provides quick navigation by clicking summary cards to open related Admin modules.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-11",
+      "title": "Project build template + shared UI component library scaffolding (shadcn-ui)",
+      "synonyms": [
+        "build-template",
+        "shadcn-ui components",
+        "deployment scaffold"
+      ],
+      "description": "Added/updated the repository build-template infrastructure (Dockerfile, deploy scripts, ICP canister configs, workspace/package setup) and introduced/expanded a shared shadcn-ui component set and related frontend build/lint configuration to standardize UI and packaging.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-12",
+      "title": "Admin Invoice panel UI scaffolding",
+      "synonyms": [
+        "invoices",
+        "billing panel"
+      ],
+      "description": "Introduced an AdminInvoicePanel component as part of the Admin UI module set (UI scaffolding only, based on component presence).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-13",
+      "title": "Startup gating + performance instrumentation for initial load",
+      "synonyms": [
+        "StartupGate",
+        "startup guards",
+        "startup performance"
+      ],
+      "description": "Added a StartupGate/startup-guards flow and startup performance utilities to better control app initialization and diagnose/mitigate slow loading behavior during startup.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-14",
+      "title": "Production stabilization/deployment hardening documentation and config updates",
+      "synonyms": [
+        "production stabilization",
+        "deployment hardening"
+      ],
+      "description": "Introduced production stabilization guidance and updated build/deploy template/configuration files to improve reliability of production builds and deployments.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-perform-a-production-internet-computer-mainnet-deployment-for-the-current-build-version-16-so-the-application-is-reachable-and-usable-on-the-production-url-including-deploying-upgrading-both-backend-and-frontend-canisters-as-needed",
+      "title": "Perform a production (Internet Computer mainnet) deployment for the current build (Version 16) so the application is reachable and usable on the production URL, including deploying/upgrading both backend and frontend canisters as needed.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-run-and-confirm-the-production-verification-checklist-in-frontend-production-stabilization-md-after-deployment-covering-unauthenticated-initial-load-behavior-and-post-login-startup-behavior",
+      "title": "Run and confirm the production verification checklist in `frontend/PRODUCTION_STABILIZATION.md` after deployment, covering unauthenticated initial-load behavior and post-login startup behavior.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-if-any-step-of-production-deployment-fails-or-requires-retries-capture-and-document-1-the-exact-deploy-command-used-2-full-deploy-output-error-logs-and-3-final-backend-frontend-canister-ids-in-frontend-production-deployment-logs-md",
+      "title": "If any step of production deployment fails or requires retries, capture and document (1) the exact deploy command used, (2) full deploy output/error logs, and (3) final backend/frontend canister IDs in `frontend/PRODUCTION_DEPLOYMENT_LOGS.md`.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-4",
+      "summary": "Admin dashboard modules: Overview, Agents (name/contact/email/live status/pending approval), Customers, Follow-ups, Attendance (all agents history), WhatsApp, Settings",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Agent dashboard modules: Overview, Customers, Follow-ups, Attendance (self + history), WhatsApp, Leads (self-assigned only, mandatory remarks within 8 hours), Settings",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Follow-up automation: after overdue follow-up, automatically message customer and enable direct phone calling from the app",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Attendance feature: capture agent attendance with live location address and face authentication; provide admin view of all agents and agent self-history",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Settings: chat theme customization and language switch (Hindi/English); admin can change details of all panels except Attendance settings",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Implement Admin 'Agents' panel showing: agent name, contact number, email, live/online status, and pending approval status; include face image preview; enable Admin approve/reject with optional rejection reason.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Implement Follow-up module for both roles: create follow-ups linked to a customer with due date/time and notes; show overdue follow-ups; provide actions to generate an automatic message and to initiate a phone call via device dialer link.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Implement Attendance module: agents can submit attendance with a face image capture/upload and a manually entered 'current address' string; store attendance history; Admin can view attendance history for all agents; Agent can view self history.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Implement Leads module for Agent: agent can add leads manually; a lead is always assigned to the creating agent only; enforce that a remark must be provided within 8 hours of lead creation and clearly surface overdue remark status.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add Settings for both roles: chat theme selection (multiple presets) and language selection (English/Hindi). Admin settings can also edit configurable aspects of other panels except Attendance settings; Agent settings apply to the agent user only.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add activity tracking visible to Admin: record key agent/customer actions (registration submitted, approval changes, customer created/edited, follow-up created/completed, lead created/remark added, attendance submitted) and show them in Admin views (Overview and/or a dedicated activity list).",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Apply a coherent, non-blue/non-purple visual theme across the entire app (layout, typography, spacing, components) suitable for a real-estate CRM; keep Admin and Agent dashboards visually consistent but clearly labeled.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Add generated static image assets (logo + app icon) and render them in the UI (auth page header, app sidebar/topbar). Store generated images under frontend/public/assets/generated and reference them directly from the frontend.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Extend Follow-up module so Agents can create follow-ups for both Customers and Leads (not only Customers)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-28",
+      "summary": "Seed/initialize the primary Admin profile with Admin name “Vipin Maurya” and mobile number “7217637770”, and allow Admin login using the seeded credentials.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Implement Admin dashboard modules and navigation: Overview, Agents, Customers, Follow-ups, Attendance, WhatsApp, Settings. Overview must show summary cards for each module and allow clicking a card to open the module.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Implement Agent dashboard modules and navigation: Overview, Customers, Follow-ups, Attendance, WhatsApp, Leads, Settings. Agent can add follow-ups for both customers and leads.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Implement Leads module for Agent: agent can add leads manually; lead is always assigned only to the creating agent; enforce that a remark is mandatory within 8 hours of lead creation and clearly display overdue remark status.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Implement Follow-ups module for both roles: create follow-ups with due date/time and remarks; show overdue follow-ups; allow linking follow-ups to a Customer or a Lead; Admin can see all follow-ups; Agent can see only own follow-ups.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Implement Attendance module using practical web inputs: agent submits attendance with a face image (capture/upload) and a manually entered current address string; store attendance history; Admin can view all agents’ attendance history; Agent can view own history.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "Implement Admin visibility into all agent and customer activities by recording key actions (agent registration submitted, approval changes, customer created, lead created/remark added, follow-up created, attendance submitted) and displaying them in Admin (Overview and/or a dedicated activity list).",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-40",
+      "summary": "Implement Admin Agents panel fields: agent name, contact number, email id, live/online status, and pending approval status; include face image preview; allow approve/reject actions.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-41",
+      "summary": "Implement Settings for both roles: chat theme selection (include presets: warm white, dark, light red, light blue, light green, ocean) and language selection (English and Hindi). Admin Settings additionally provides configuration editing for other panels except Attendance.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-42",
+      "summary": "Apply one coherent, real-estate CRM visual theme across the app (do not use blue/purple as primary colors), keeping Admin and Agent dashboards consistent but clearly labeled by role.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-43",
+      "summary": "Generate and add static brand assets (logo and app icon) and render them in the UI (e.g., auth header and dashboard sidebar/topbar). Store generated images under frontend/public/assets/generated and reference them from the frontend.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-44",
+      "summary": "Enforce unique mobile-number registration: a mobile number can be registered only once; after first registration, the user must log in (no duplicate registrations)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-45",
+      "summary": "Make face capture/authentication mandatory for Agent registration AND Agent login; block completion without successful face authentication.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-46",
+      "summary": "Admin Agent management enhancements: show agent face + last login time; allow Admin to edit/delete agents; ensure approve/reject workflow is fully functional and agents cannot log in until approved.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-47",
+      "summary": "Add Admin ability to add Leads and Customers from Admin dashboard (create forms similar to Agent, but with admin visibility/control).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-48",
+      "summary": "Admin reporting panel for pending/approved agents and lead/customer statuses, including CSV export (and optional filters).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-49",
+      "summary": "Invoice generation by Admin only, with ability to send invoice via WhatsApp to a Lead or Customer.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-50",
+      "summary": "Admin WhatsApp panel should show consolidated agent-to-lead/customer WhatsApp chat history and call activity logs (visibility across all agents).",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "architecturalNotes": [
+    "Plan for role-based access control with separate Admin/Agent dashboards and a shared login entry point that routes by role/approval status.",
+    "Agent onboarding requires face recognition capture and admin approval; store face image for display in admin panel.",
+    "Attendance requires live location/address capture and face authentication at check-in.",
+    "Integrations needed for WhatsApp messaging and phone call initiation from within the app.",
+    "App must support theming and i18n (Hindi/English).",
+    "Seed/initialize default Admin profile details: name 'Vipin Maurya' and mobile number '7217637770' (used for initial admin account/contact info).",
+    "Enforce unique constraint on user mobile numbers (especially Agent accounts) to prevent duplicate registrations; if a mobile number already exists, block registration and direct the user to login (or recovery flow if needed).",
+    "Seed/initialize default Admin profile email id as 'infravrhomes@gmail.com' (in addition to name 'Vipin Maurya' and mobile '7217637770').",
+    "Frontend uses Internet Identity integration hooks (useInternetIdentity/useActor) as part of the authentication flow; ensure II provider requirements remain enforced via lint/build rules.",
+    "Repository now includes a build-template workspace for ICP deployment (canister.yaml configs, deploy.sh, Dockerfile) and scripts for image handling (resize/prune) to standardize builds/releases.",
+    "Frontend UI baseline expanded with shadcn-ui component library files and associated tooling (Tailwind/Vite/ESLint rules) to enforce consistent UI patterns across dashboards.",
+    "Use a dedicated startup gating layer (StartupGate + startup guards) to sequence authentication/actor initialization and prevent long/indeterminate loading states; capture startup timing via startupPerf utilities for diagnostics.",
+    "Maintain and reference a production stabilization runbook (frontend/PRODUCTION_STABILIZATION.md) alongside deployment template/config updates to reduce production deployment failures.",
+    "Require face authentication at both Agent registration and Agent login; block completion if face capture/auth fails.",
+    "Admin Agents panel should display agent face image and login timing/last-login metadata; live/online status should be consistent with session tracking.",
+    "Admin reporting should support CSV export of key entities/statuses (agents pending/approved, leads/customers), optionally with basic filters.",
+    "Admin-only invoice generation and WhatsApp sending flow (invoice delivered to lead/customer via WhatsApp).",
+    "Admin WhatsApp visibility includes consolidated chat/call activity across agents, leads, and customers."
+  ],
+  "knownIssues": [
+    "Production deployment is failing (\"Production deployment failed: Deployment failed\"), preventing the app from going live.",
+    "App is taking too long on the loading page / slow load time reported by user (\"Taking to time on loading page\", \"Not going Live, taking too many time\").",
+    "Agent approval workflow is unreliable: newly registered agents are not appearing as pending/approved in Admin dashboard; approval sync failing.",
+    "Unapproved agents were able to log in (approval gate failing).",
+    "Face capture/authentication was not working reliably; mandatory face capture at registration/login not consistently enforced."
+  ],
+  "isFixRequest": true,
+  "gameProjectType": "none",
+  "projectName": "VR Homes Infra CRM",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0,
+  "requiresBackendChanges": true,
+  "requiresFrontendChanges": true
+}

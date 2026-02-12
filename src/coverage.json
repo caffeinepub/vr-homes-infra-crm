@@ -1,0 +1,75 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-03T15:33:44.030Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 3,
+    "items": [
+      {
+        "id": "REQ-33",
+        "summary": "Perform a production (Internet Computer mainnet) deployment for the current build (Version 16) so the application is reachable and usable on the production URL, including deploying/upgrading both backend and frontend canisters as needed.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/PRODUCTION_STABILIZATION.md",
+          "frontend/scripts/deploy-mainnet-version16.md",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/PRODUCTION_STABILIZATION.md",
+          "frontend/scripts/deploy-mainnet-version16.md",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-34",
+        "summary": "Run and confirm the production verification checklist in `frontend/PRODUCTION_STABILIZATION.md` after deployment, covering unauthenticated initial-load behavior and post-login startup behavior.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/PRODUCTION_STABILIZATION.md",
+          "frontend/src/main.tsx",
+          "frontend/src/hooks/useActorStable.ts",
+          "frontend/src/hooks/useStartupGuards.ts"
+        ],
+        "matchedFiles": [
+          "frontend/PRODUCTION_STABILIZATION.md",
+          "frontend/src/hooks/useActorStable.ts",
+          "frontend/src/hooks/useStartupGuards.ts"
+        ]
+      },
+      {
+        "id": "REQ-35",
+        "summary": "If any step of production deployment fails or requires retries, capture and document (1) the exact deploy command used, (2) full deploy output/error logs, and (3) final backend/frontend canister IDs in `frontend/PRODUCTION_DEPLOYMENT_LOGS.md`.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/PRODUCTION_DEPLOYMENT_LOGS.md",
+          "frontend/PRODUCTION_STABILIZATION.md"
+        ],
+        "matchedFiles": [
+          "frontend/PRODUCTION_DEPLOYMENT_LOGS.md",
+          "frontend/PRODUCTION_STABILIZATION.md"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/PRODUCTION_DEPLOYMENT_LOGS.md",
+    "frontend/PRODUCTION_STABILIZATION.md",
+    "frontend/scripts/deploy-mainnet-version16.md",
+    "frontend/src/App.tsx",
+    "frontend/src/hooks/useActorStable.ts",
+    "frontend/src/hooks/useStartupGuards.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

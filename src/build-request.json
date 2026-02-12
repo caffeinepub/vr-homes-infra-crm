@@ -1,0 +1,74 @@
+{
+  "kind": "build_request",
+  "title": "Make Version 16 fully live on the production URL (mainnet deployment + verification)",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-33",
+      "text": "Perform a production (Internet Computer mainnet) deployment for the current build (Version 16) so the application is reachable and usable on the production URL, including deploying/upgrading both backend and frontend canisters as needed.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Yes fully live on production URL."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Production deployment completes successfully without a deployment failure",
+        "Backend canister is installed/upgraded successfully on mainnet",
+        "Frontend canister is installed/upgraded successfully on mainnet",
+        "The app is reachable on the production URL and loads without a prolonged blank/loading screen"
+      ]
+    },
+    {
+      "id": "REQ-34",
+      "text": "Run and confirm the production verification checklist in `frontend/PRODUCTION_STABILIZATION.md` after deployment, covering unauthenticated initial-load behavior and post-login startup behavior.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Yes fully live on production URL."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Unauthenticated users see the Auth page immediately (no prolonged loading screen)",
+        "Post-login transitions to the correct dashboard with only brief, lightweight loading indicators",
+        "No unexpected console errors appear in a production build during normal navigation"
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "text": "If any step of production deployment fails or requires retries, capture and document (1) the exact deploy command used, (2) full deploy output/error logs, and (3) final backend/frontend canister IDs in `frontend/PRODUCTION_DEPLOYMENT_LOGS.md`.",
+      "target": "unknown",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Yes fully live on production URL."
+        ]
+      },
+      "acceptanceCriteria": [
+        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` includes the exact production deploy command used",
+        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` includes full deploy output/error logs (when applicable)",
+        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` lists the final Backend Canister ID and Frontend Canister ID used for production"
+      ]
+    }
+  ],
+  "constraints": [
+    "Respect the existing single-actor Motoko backend architecture (all logic in `backend/main.mo`); only add `backend/migration.mo` if an upgrade requires state migration.",
+    "Do not edit any files under `frontend/src/components/ui` (shadcn-ui) or any frontend paths listed as immutable in SYSTEM_CONTEXT."
+  ],
+  "nonGoals": [
+    "Do not add new CRM modules or change business logic unrelated to production go-live.",
+    "Do not introduce new third-party services or authentication providers (Internet Identity only)."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
