@@ -1,71 +1,85 @@
 {
   "kind": "build_request",
-  "title": "Make Version 16 fully live on the production URL (mainnet deployment + verification)",
-  "priority": "high",
+  "title": "Fix agent approval not appearing in Admin after agent registration",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-33",
-      "text": "Perform a production (Internet Computer mainnet) deployment for the current build (Version 16) so the application is reachable and usable on the production URL, including deploying/upgrading both backend and frontend canisters as needed.",
-      "target": "both",
+      "text": "Ensure that when an Agent registers, the registration is persisted in the backend in a way that makes the Agent immediately appear in the Admin pending-approval workflow.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "Yes fully live on production URL."
+          "Agent approval is not showing after registration of agent."
         ]
       },
       "acceptanceCriteria": [
-        "Production deployment completes successfully without a deployment failure",
-        "Backend canister is installed/upgraded successfully on mainnet",
-        "Frontend canister is installed/upgraded successfully on mainnet",
-        "The app is reachable on the production URL and loads without a prolonged blank/loading screen"
+        "After a successful `registerAgent(...)` call, the registering Agent is visible to an Admin in the pending agents list without requiring any manual backend intervention.",
+        "A newly registered Agent has an approval status of \"pending\" until explicitly approved or rejected by an Admin."
       ]
     },
     {
       "id": "REQ-34",
-      "text": "Run and confirm the production verification checklist in `frontend/PRODUCTION_STABILIZATION.md` after deployment, covering unauthenticated initial-load behavior and post-login startup behavior.",
-      "target": "frontend",
+      "text": "Make `getAllAgentProfiles()` return an approval `status` that is consistent with the approval system (UserApproval state), so Admin UI filtering (pending/approved/rejected) works reliably for every agent profile.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "Yes fully live on production URL."
+          "Agent approval is not showing after registration of agent."
         ]
       },
       "acceptanceCriteria": [
-        "Unauthenticated users see the Auth page immediately (no prolonged loading screen)",
-        "Post-login transitions to the correct dashboard with only brief, lightweight loading indicators",
-        "No unexpected console errors appear in a production build during normal navigation"
+        "For every agent profile returned by `getAllAgentProfiles()`, the `status` field accurately reflects the current approval state (pending/approved/rejected).",
+        "The Admin pending list (frontend `PendingAgentsList` filtering via `isPending(agent.status)`) includes newly registered agents whose approval is pending."
       ]
     },
     {
       "id": "REQ-35",
-      "text": "If any step of production deployment fails or requires retries, capture and document (1) the exact deploy command used, (2) full deploy output/error logs, and (3) final backend/frontend canister IDs in `frontend/PRODUCTION_DEPLOYMENT_LOGS.md`.",
-      "target": "unknown",
+      "text": "Ensure Admin approval actions update the same underlying agent approval state that is displayed in Admin lists, so approving/rejecting a pending agent immediately moves the agent between Pending and Approved views.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "Yes fully live on production URL."
+          "Agent approval is not showing after registration of agent."
         ]
       },
       "acceptanceCriteria": [
-        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` includes the exact production deploy command used",
-        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` includes full deploy output/error logs (when applicable)",
-        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` lists the final Backend Canister ID and Frontend Canister ID used for production"
+        "Calling backend `approveAgent(mobile)` causes the agent to disappear from the pending list and appear in the approved list on the next fetch/refetch.",
+        "Calling backend `rejectAgent(mobile)` causes the agent to disappear from the pending list and be marked rejected in backend state.",
+        "No mismatch exists between approval state used by `listApprovals()` and the `status` exposed on agent profiles used by Admin UI lists."
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "text": "Update the frontend Admin agent approval views to clearly surface backend fetch errors (e.g., authorization or failed query) instead of silently showing an empty pending list, so admins can distinguish \"no pending agents\" from \"cannot load pending agents\".",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "Agent approval is not showing after registration of agent."
+        ]
+      },
+      "acceptanceCriteria": [
+        "If `useGetAllAgentProfiles()` fails, the Admin pending agents panel shows an error state with a readable English message and a retry action (or guidance to re-login).",
+        "If `useGetAllAgentProfiles()` succeeds and there are truly no pending agents, the UI continues to show: \"No pending agent registrations at this time.\""
       ]
     }
   ],
   "constraints": [
-    "Respect the existing single-actor Motoko backend architecture (all logic in `backend/main.mo`); only add `backend/migration.mo` if an upgrade requires state migration.",
-    "Do not edit any files under `frontend/src/components/ui` (shadcn-ui) or any frontend paths listed as immutable in SYSTEM_CONTEXT."
+    "Backend must remain a single Motoko actor in `backend/main.mo` (no additional backend services).",
+    "Do not edit any files under `frontend/src/components/ui` or any paths listed in `frontend.immutablePaths` in SYSTEM_CONTEXT."
   ],
   "nonGoals": [
-    "Do not add new CRM modules or change business logic unrelated to production go-live.",
-    "Do not introduce new third-party services or authentication providers (Internet Identity only)."
+    "Do not add new modules or redesign the dashboards beyond what is required to fix the missing agent approval visibility.",
+    "Do not introduce external databases or third-party services."
   ],
   "imageRequirements": {
     "required": [],

@@ -9,24 +9,21 @@ import Array "mo:core/Array";
 import Order "mo:core/Order";
 import UserApproval "user-approval/approval";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import OutCall "http-outcalls/outcall";
 
+// Run data migration on upgrade
+(with migration = Migration.run)
 actor {
-  type Status = {
-    #pending;
-    #approved;
-    #rejected;
-  };
-
   public type FaceEmbeddings = Blob;
   public type UserRole = {
     #admin;
     #agent;
   };
 
-  type AgentProfile = {
+  public type AgentProfile = {
     name : Text;
     mobile : Text;
     email : Text;
@@ -61,7 +58,7 @@ actor {
     #Interior;
   };
 
-  type LeadStatus = {
+  public type LeadStatus = {
     #new;
     #converted;
     #lost;

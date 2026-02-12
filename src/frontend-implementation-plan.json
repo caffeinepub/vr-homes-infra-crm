@@ -1,84 +1,25 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Version 16 production go-live readiness (frontend-side deployment docs + verification + startup stability)",
+  "title": "Admin Pending Agents: surface backend fetch errors with retry",
   "requirements": [
     {
-      "id": "REQ-33",
-      "summary": "Prepare frontend-side production deployment guidance and readiness to support making Version 16 live on the production URL.",
+      "id": "REQ-36",
+      "summary": "Show clear, retryable error states in Admin agent approval views when loading agent profiles fails (vs silently showing empty lists).",
       "acceptanceCriteria": [
-        "Production deployment completes successfully without a deployment failure",
-        "Backend canister is installed/upgraded successfully on mainnet",
-        "Frontend canister is installed/upgraded successfully on mainnet",
-        "The app is reachable on the production URL and loads without a prolonged blank/loading screen"
+        "If `useGetAllAgentProfiles()` fails, the Admin pending agents panel shows an error state with a readable English message and a retry action (or guidance to re-login).",
+        "If `useGetAllAgentProfiles()` succeeds and there are truly no pending agents, the UI continues to show: \"No pending agent registrations at this time.\""
       ],
       "file_operations": [
         {
-          "path": "frontend/PRODUCTION_STABILIZATION.md",
+          "path": "frontend/src/components/PendingAgentsList.tsx",
           "operation": "modify",
-          "description": "Update the document from Version 15 to Version 16 and add/refresh the production deployment section (mainnet deploy/upgrade steps, required prechecks, and post-deploy smoke checks focused on production URL reachability and avoiding prolonged blank/loading screens)."
+          "description": "Add explicit fetch error handling for `useGetAllAgentProfiles()` (use query `error`/`isError`) and render a distinct error panel with a readable English message and a Retry action (calling `refetch`). If the error indicates authorization (e.g., includes \"Unauthorized\"), include guidance to re-login. Ensure the existing successful-empty state message remains unchanged. This aligns with the authorization component’s guidance to handle authorization failures gracefully; verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/scripts/deploy-mainnet-version16.md",
-          "operation": "create",
-          "description": "Create a concise, reproducible mainnet deployment runbook for Version 16 that specifies the exact command patterns to deploy/upgrade canisters, how to confirm the production URL is serving the latest assets, and what to capture if retries are needed."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Review and harden production initial-load behavior so unauthenticated users render the Auth page immediately and authenticated users only see brief, lightweight loading indicators while dashboards lazy-load (no prolonged blank/loading screen)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-34",
-      "summary": "Ensure the production verification checklist is current and the app startup flow meets the checklist expectations (unauthenticated fast Auth render, post-login lightweight startup, no unexpected production console errors).",
-      "acceptanceCriteria": [
-        "Unauthenticated users see the Auth page immediately (no prolonged loading screen)",
-        "Post-login transitions to the correct dashboard with only brief, lightweight loading indicators",
-        "No unexpected console errors appear in a production build during normal navigation"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/PRODUCTION_STABILIZATION.md",
-          "operation": "modify",
-          "description": "Refresh and reorder the verification checklist to match Version 16 behavior, explicitly covering unauthenticated initial-load, post-login startup, and normal navigation checks, including what to observe in the browser console in a production build."
-        },
-        {
-          "path": "frontend/src/main.tsx",
-          "operation": "modify",
-          "description": "Configure React Query production-friendly defaults (to reduce startup query churn and refetch storms) and add production-safe console suppression for non-essential logs so production builds do not emit unexpected console output during normal navigation."
-        },
-        {
-          "path": "frontend/src/hooks/useActorStable.ts",
-          "operation": "modify",
-          "description": "Confirm actor initialization remains resilient and non-blocking for unauthenticated sessions, and ensure authenticated initialization failures surface as actionable errors with minimal retries to avoid prolonged startup loading in production."
-        },
-        {
-          "path": "frontend/src/hooks/useStartupGuards.ts",
-          "operation": "modify",
-          "description": "Verify startup guards remain conditionally enabled only when authenticated, and that retry behavior invalidates only the necessary startup queries to keep post-login transitions lightweight."
-        }
-      ]
-    },
-    {
-      "id": "REQ-35",
-      "summary": "Provide a Version 16 production deployment logging template to capture commands, full output/error logs, and final canister IDs when deployment fails or requires retries.",
-      "acceptanceCriteria": [
-        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` includes the exact production deploy command used",
-        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` includes full deploy output/error logs (when applicable)",
-        "`frontend/PRODUCTION_DEPLOYMENT_LOGS.md` lists the final Backend Canister ID and Frontend Canister ID used for production"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/PRODUCTION_DEPLOYMENT_LOGS.md",
-          "operation": "modify",
-          "description": "Update the template from Version 15 to Version 16 and restructure it to explicitly capture (1) the exact deploy command used, (2) full deploy output/error logs (including retries), and (3) final Backend/Frontend canister IDs and production URL verification notes."
-        },
-        {
-          "path": "frontend/PRODUCTION_STABILIZATION.md",
-          "operation": "modify",
-          "description": "Add a short cross-reference section pointing to `frontend/PRODUCTION_DEPLOYMENT_LOGS.md` and enumerating what must be recorded whenever a deploy step fails or needs retries."
+          "description": "Adjust `useGetAllAgentProfiles()` React Query options to support reliable error surfacing in the UI (e.g., disable auto-retry if it obscures persistent authorization failures, and ensure the query exposes `error`/`isError`/`refetch` to consumers). This complements the authorization component’s requirement to present authorization failures clearly; verify the component's usage instructions before implementing."
         }
       ]
     }

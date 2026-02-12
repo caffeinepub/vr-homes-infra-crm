@@ -1,72 +1,61 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-03T15:33:44.030Z",
+  "generatedAt": "2026-02-12T09:38:21.997Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 4,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-33",
-        "summary": "Perform a production (Internet Computer mainnet) deployment for the current build (Version 16) so the application is reachable and usable on the production URL, including deploying/upgrading both backend and frontend canisters as needed.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/PRODUCTION_STABILIZATION.md",
-          "frontend/scripts/deploy-mainnet-version16.md",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/PRODUCTION_STABILIZATION.md",
-          "frontend/scripts/deploy-mainnet-version16.md",
-          "frontend/src/App.tsx"
-        ]
+        "summary": "Ensure that when an Agent registers, the registration is persisted in the backend in a way that makes the Agent immediately appear in the Admin pending-approval workflow.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-34",
-        "summary": "Run and confirm the production verification checklist in `frontend/PRODUCTION_STABILIZATION.md` after deployment, covering unauthenticated initial-load behavior and post-login startup behavior.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/PRODUCTION_STABILIZATION.md",
-          "frontend/src/main.tsx",
-          "frontend/src/hooks/useActorStable.ts",
-          "frontend/src/hooks/useStartupGuards.ts"
-        ],
-        "matchedFiles": [
-          "frontend/PRODUCTION_STABILIZATION.md",
-          "frontend/src/hooks/useActorStable.ts",
-          "frontend/src/hooks/useStartupGuards.ts"
-        ]
+        "summary": "Make `getAllAgentProfiles()` return an approval `status` that is consistent with the approval system (UserApproval state), so Admin UI filtering (pending/approved/rejected) works reliably for every agent profile.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-35",
-        "summary": "If any step of production deployment fails or requires retries, capture and document (1) the exact deploy command used, (2) full deploy output/error logs, and (3) final backend/frontend canister IDs in `frontend/PRODUCTION_DEPLOYMENT_LOGS.md`.",
+        "summary": "Ensure Admin approval actions update the same underlying agent approval state that is displayed in Admin lists, so approving/rejecting a pending agent immediately moves the agent between Pending and Approved views.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-36",
+        "summary": "Update the frontend Admin agent approval views to clearly surface backend fetch errors (e.g., authorization or failed query) instead of silently showing an empty pending list, so admins can distinguish \"no pending agents\" from \"cannot load pending agents\".",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/PRODUCTION_DEPLOYMENT_LOGS.md",
-          "frontend/PRODUCTION_STABILIZATION.md"
+          "frontend/src/components/PendingAgentsList.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/PRODUCTION_DEPLOYMENT_LOGS.md",
-          "frontend/PRODUCTION_STABILIZATION.md"
+          "frontend/src/components/PendingAgentsList.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
+    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/PRODUCTION_DEPLOYMENT_LOGS.md",
-    "frontend/PRODUCTION_STABILIZATION.md",
-    "frontend/scripts/deploy-mainnet-version16.md",
-    "frontend/src/App.tsx",
-    "frontend/src/hooks/useActorStable.ts",
-    "frontend/src/hooks/useStartupGuards.ts",
+    "frontend/src/components/PendingAgentsList.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

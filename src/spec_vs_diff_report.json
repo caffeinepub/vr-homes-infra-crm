@@ -1,63 +1,57 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-03T15:33:43.976Z",
-  "summary": "The diff focuses on frontend startup/performance stabilization (lazy loading, conditional startup queries, reduced retries) and adds a mainnet deployment runbook plus a production deployment logs template. However, it does not provide evidence of an actual successful mainnet deployment, completion of the post-deploy verification checklist, or populated deployment logs with commands/output and final canister IDs.",
+  "generatedAt": "2026-02-12T09:38:21.993Z",
+  "summary": "Frontend now surfaces errors in the Admin pending agents panel with a readable message plus retry/re-login actions. However, the diff summary does not provide enough evidence that the backend now persists new agent registrations into the Admin pending-approval workflow, that getAllAgentProfiles() exposes a status consistent with the approval system, or that approve/reject actions update the same underlying approval state used by Admin lists.",
   "missing_requirements": [
     {
       "id": "REQ-33",
-      "requirement": "Perform a production (Internet Computer mainnet) deployment for Version 16 so the application is reachable and usable on the production URL, including deploying/upgrading both backend and frontend canisters as needed.",
-      "reason": "The diff contains documentation/runbooks and frontend changes, but no evidence of an executed mainnet deployment, no backend/frontend canister install/upgrade results, and no production URL/canister IDs demonstrating the app is live.",
+      "requirement": "Ensure that when an Agent registers, the registration is persisted in the backend so the Agent immediately appears in the Admin pending-approval workflow with status \"pending\".",
+      "reason": "backend/main.mo is truncated and the diff summary does not show changes to registerAgent(...) (or equivalent) that persist the agent profile and set an initial pending approval state that the Admin pending list can fetch immediately.",
       "evidence": [
-        "frontend/scripts/deploy-mainnet-version16.md",
-        "frontend/PRODUCTION_DEPLOYMENT_LOGS.md"
+        "backend/main.mo (truncated)"
       ]
     },
     {
       "id": "REQ-34",
-      "requirement": "Run and confirm the production verification checklist in frontend/PRODUCTION_STABILIZATION.md after deployment (unauthenticated initial-load behavior and post-login startup behavior).",
-      "reason": "The stabilization doc included is largely explanatory (issues/root causes/changes) and is truncated; the diff does not show completed/confirmed checklist results or recorded verification outcomes after an actual deployment.",
+      "requirement": "Make getAllAgentProfiles() return an approval status consistent with the approval system (pending/approved/rejected) for every agent profile so Admin UI filtering works reliably.",
+      "reason": "The diff summary does not show the implementation of getAllAgentProfiles() or any mapping logic that derives AgentProfile.status from the UserApproval state; backend/main.mo is truncated before the relevant methods.",
       "evidence": [
-        "frontend/PRODUCTION_STABILIZATION.md (truncated)"
+        "backend/main.mo (truncated)"
       ]
     },
     {
       "id": "REQ-35",
-      "requirement": "If deployment fails or requires retries, document the exact deploy command used, full deploy output/error logs, and final backend/frontend canister IDs in frontend/PRODUCTION_DEPLOYMENT_LOGS.md.",
-      "reason": "frontend/PRODUCTION_DEPLOYMENT_LOGS.md appears to be a template with placeholders and does not include the actual deploy command, full output/error logs, or final backend/frontend canister IDs.",
+      "requirement": "Ensure Admin approve/reject actions update the same underlying approval state that is displayed in Admin lists (no mismatch between listApprovals() and profile status).",
+      "reason": "The diff summary does not show approveAgent(mobile) / rejectAgent(mobile) implementations or how they synchronize the approval state with the status returned on agent profiles used by Admin lists.",
       "evidence": [
-        "frontend/PRODUCTION_DEPLOYMENT_LOGS.md"
+        "backend/main.mo (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added a standalone mainnet deployment runbook markdown file for Version 16.",
-      "reason": "REQ-33/34/35 request deployment, verification, and logging, but do not explicitly request creation of an additional runbook file; this is extra implementation/documentation beyond the stated requirements.",
+      "description": "Added an \"Export Agents CSV\" feature to the Approved Agents admin panel.",
+      "reason": "Not requested in the BuildRequest; the request explicitly limits changes to what is required to fix missing agent approval visibility and error surfacing.",
       "evidence": [
-        "frontend/scripts/deploy-mainnet-version16.md"
+        "frontend-file-summaries.txt (entry for \"frontend/src/components/ApprovedAgentsList.tsx\")"
       ]
     },
     {
-      "description": "Implemented frontend startup/performance changes (lazy-loaded dashboards, conditional startup guard execution, reduced React Query retries/behavior adjustments).",
-      "reason": "The requirements are about production deployment, verification, and deployment logging; these code changes may help satisfy acceptance criteria (avoid prolonged loading), but they are not explicitly requested as deliverables in REQ-33/34/35.",
+      "description": "Introduced a backend migration module that sets all existing agent profiles' status to #pending during migration.",
+      "reason": "The BuildRequest does not ask for a migration or for resetting existing agents to pending; it only asks to ensure new registrations appear pending and status is consistent with the approval system.",
       "evidence": [
-        "frontend/src/App.tsx",
-        "frontend/src/hooks/useActorStable.ts",
-        "frontend/src/hooks/useStartupGuards.ts",
-        "frontend-file-summaries.txt"
+        "backend/migration.mo"
       ]
     }
   ],
-  "confidence": 0.72,
+  "confidence": 0.58,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/PRODUCTION_DEPLOYMENT_LOGS.md",
-    "frontend/PRODUCTION_STABILIZATION.md",
-    "frontend/scripts/deploy-mainnet-version16.md",
-    "frontend/src/App.tsx",
-    "frontend/src/hooks/useActorStable.ts",
-    "frontend/src/hooks/useStartupGuards.ts",
+    "frontend/src/components/PendingAgentsList.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

@@ -257,6 +257,7 @@ export function useGetAllAgentProfiles() {
       return profiles;
     },
     enabled: !!actor && !actorLoading,
+    retry: 1, // Only retry once to avoid obscuring persistent failures
     refetchInterval: 10000, // Refetch every 10 seconds
     staleTime: 5000, // Consider data stale after 5 seconds
   });
@@ -430,18 +431,20 @@ export function useAddLead() {
       email,
       status,
       requirement,
-      description,
       assignedAgent,
+      description,
       remarks,
+      remarksTimestamp,
     }: {
       name: string;
       mobile: string;
       email?: string;
       status: LeadStatus;
       requirement: LeadRequirement;
-      description: string;
       assignedAgent: string;
+      description: string;
       remarks?: string;
+      remarksTimestamp?: bigint;
     }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.addLead(
@@ -453,7 +456,7 @@ export function useAddLead() {
         assignedAgent,
         description,
         remarks || null,
-        null
+        remarksTimestamp || null
       );
     },
     onSuccess: () => {
@@ -476,10 +479,7 @@ export function useGetAllFollowUps() {
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
       const entries = await actor.getFollowUps();
-      return entries.map(([_, followUp]) => ({
-        ...followUp,
-        type: followUp.type,
-      }));
+      return entries.map(([_, followUp]) => followUp);
     },
     enabled: !!actor && !actorLoading,
     staleTime: 30000, // 30 seconds
@@ -494,10 +494,7 @@ export function useGetFollowUpsByAgent(agentMobile: string) {
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
       const entries = await actor.getFollowUps();
-      return entries.map(([_, followUp]) => ({
-        ...followUp,
-        type: followUp.type,
-      }));
+      return entries.map(([_, followUp]) => followUp);
     },
     enabled: !!actor && !actorLoading && !!agentMobile,
     staleTime: 30000, // 30 seconds
@@ -534,6 +531,54 @@ export function useAddFollowUp() {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to add follow-up');
+    },
+  });
+}
+
+export function useUpdateFollowUp() {
+  const { actor } = useActorStable();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      followUpId,
+      remarks,
+      status,
+    }: {
+      followUpId: string;
+      remarks: string;
+      status: string;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.updateFollowUp(followUpId, remarks, status);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['followUpsByAgent'] });
+      queryClient.invalidateQueries({ queryKey: ['allFollowUps'] });
+      toast.success('Follow-up updated successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to update follow-up');
+    },
+  });
+}
+
+export function useDeleteFollowUp() {
+  const { actor } = useActorStable();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (followUpId: string) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.deleteFollowUp(followUpId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['followUpsByAgent'] });
+      queryClient.invalidateQueries({ queryKey: ['allFollowUps'] });
+      toast.success('Follow-up deleted successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to delete follow-up');
     },
   });
 }

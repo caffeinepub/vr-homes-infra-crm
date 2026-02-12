@@ -2,13 +2,13 @@ import { useGetAllAgentProfiles, useApproveAgent, useRejectAgent } from '../hook
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Loader2, CheckCircle, XCircle, User } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, User, AlertCircle, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription } from './ui/alert';
 import { useMemo, useState } from 'react';
 import { isPending } from '../utils/approvalStatus';
 
 export default function PendingAgentsList() {
-  const { data: allAgents, isLoading } = useGetAllAgentProfiles();
+  const { data: allAgents, isLoading, isError, error, refetch } = useGetAllAgentProfiles();
   const approveAgent = useApproveAgent();
   const rejectAgent = useRejectAgent();
   const [processingMobile, setProcessingMobile] = useState<string | null>(null);
@@ -41,6 +41,49 @@ export default function PendingAgentsList() {
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
+    );
+  }
+
+  // Show error state with retry option
+  if (isError) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to load agent profiles';
+    const isAuthError = errorMessage.toLowerCase().includes('unauthorized') || 
+                        errorMessage.toLowerCase().includes('permission');
+
+    return (
+      <Alert variant="destructive" className="border-destructive/50 bg-destructive/10">
+        <AlertCircle className="h-5 w-5" />
+        <AlertDescription className="ml-2">
+          <div className="space-y-3">
+            <p className="font-medium">Unable to load pending agent registrations</p>
+            <p className="text-sm">
+              {isAuthError 
+                ? 'You do not have permission to view agent profiles. Please ensure you are logged in as an administrator.'
+                : errorMessage}
+            </p>
+            <div className="flex gap-2 pt-2">
+              <Button
+                onClick={() => refetch()}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Retry
+              </Button>
+              {isAuthError && (
+                <Button
+                  onClick={() => window.location.reload()}
+                  variant="outline"
+                  size="sm"
+                >
+                  Re-login
+                </Button>
+              )}
+            </div>
+          </div>
+        </AlertDescription>
+      </Alert>
     );
   }
 

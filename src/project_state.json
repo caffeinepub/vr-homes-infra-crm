@@ -1,7 +1,25 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 53,
-  "summary": "Build “VR Homes Infra CRM” with distinct Admin and Agent dashboards, RBAC, agent self-registration (mobile/email/face) requiring admin approval, mandatory face authentication at both registration and login, and modules for customers, leads, follow-ups (including overdue automation), attendance (live location + face), WhatsApp actions (with admin visibility into agent chats/call activity), settings (theme + Hindi/English), admin agent management (approve/reject, edit/delete), and basic admin reporting with CSV export; stabilize startup/loading and production deployment.",
+  "projectStateVersion": 57,
+  "summary": "Build “VR Homes Infra CRM” with distinct Admin and Agent dashboards, role-based access, agent self-registration (phone/email/face) requiring admin approval, and modules for customers, leads, follow-ups (including overdue automation), attendance (live location + face), WhatsApp actions, settings (theme + Hindi/English), and full admin visibility into agent/customer activities.",
+  "architectural_notes": [
+    "Plan for role-based access control with separate Admin/Agent dashboards and a shared login entry point that routes by role/approval status.",
+    "Agent onboarding requires face recognition capture and admin approval; store face image for display in admin panel.",
+    "Attendance requires live location/address capture and face authentication at check-in.",
+    "Integrations needed for WhatsApp messaging and phone call initiation from within the app.",
+    "App must support theming and i18n (Hindi/English).",
+    "Seed/initialize default Admin profile details: name 'Vipin Maurya' and mobile number '7217637770' (used for initial admin account/contact info).",
+    "Enforce unique constraint on user mobile numbers (especially Agent accounts) to prevent duplicate registrations; if a mobile number already exists, block registration and direct the user to login (or recovery flow if needed).",
+    "Seed/initialize default Admin profile email id as 'infravrhomes@gmail.com' (in addition to name 'Vipin Maurya' and mobile '7217637770').",
+    "Frontend uses Internet Identity integration hooks (useInternetIdentity/useActor) as part of the authentication flow; ensure II provider requirements remain enforced via lint/build rules.",
+    "Repository now includes a build-template workspace for ICP deployment (canister.yaml configs, deploy.sh, Dockerfile) and scripts for image handling (resize/prune) to standardize builds/releases."
+  ],
+  "known_issues": [
+    "Production deployment is failing (\"Production deployment failed: Deployment failed\"), preventing the app from going live.",
+    "App is taking too long on the loading page / slow load time reported by user (\"Taking to time on loading page\", \"Not going Live, taking too many time\").",
+    "Agent approval is not showing after agent registration (pending/approval status not visible/updating in Admin Agents approval flow)."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "IF-1",
@@ -183,26 +201,10 @@
       "version": 1
     },
     {
-      "id": "feature-perform-a-production-internet-computer-mainnet-deployment-for-the-current-build-version-16-so-the-application-is-reachable-and-usable-on-the-production-url-including-deploying-upgrading-both-backend-and-frontend-canisters-as-needed",
-      "title": "Perform a production (Internet Computer mainnet) deployment for the current build (Version 16) so the application is reachable and usable on the production URL, including deploying/upgrading both backend and frontend canisters as needed.",
+      "id": "feature-update-the-frontend-admin-agent-approval-views-to-clearly-surface-backend-fetch-errors-e-g-authorization-or-failed-query-instead-of-silently-showing-an-empty-pending-list-so-admins-can-distinguish-no-pending-agents-from-cannot-load-pending-agents",
+      "title": "Update the frontend Admin agent approval views to clearly surface backend fetch errors (e.g., authorization or failed query) instead of silently showing an empty pending list, so admins can distinguish \"no pending agents\" from \"cannot load pending agents\".",
       "reqIds": [
-        "REQ-33"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-run-and-confirm-the-production-verification-checklist-in-frontend-production-stabilization-md-after-deployment-covering-unauthenticated-initial-load-behavior-and-post-login-startup-behavior",
-      "title": "Run and confirm the production verification checklist in `frontend/PRODUCTION_STABILIZATION.md` after deployment, covering unauthenticated initial-load behavior and post-login startup behavior.",
-      "reqIds": [
-        "REQ-34"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-if-any-step-of-production-deployment-fails-or-requires-retries-capture-and-document-1-the-exact-deploy-command-used-2-full-deploy-output-error-logs-and-3-final-backend-frontend-canister-ids-in-frontend-production-deployment-logs-md",
-      "title": "If any step of production deployment fails or requires retries, capture and document (1) the exact deploy command used, (2) full deploy output/error logs, and (3) final backend/frontend canister IDs in `frontend/PRODUCTION_DEPLOYMENT_LOGS.md`.",
-      "reqIds": [
-        "REQ-35"
+        "REQ-36"
       ],
       "version": 1
     }
@@ -404,73 +406,31 @@
     },
     {
       "id": "AR-45",
-      "summary": "Make face capture/authentication mandatory for Agent registration AND Agent login; block completion without successful face authentication.",
-      "reqIds": [],
+      "summary": "Ensure that when an Agent registers, the registration is persisted in the backend in a way that makes the Agent immediately appear in the Admin pending-approval workflow.",
+      "reqIds": [
+        "REQ-33"
+      ],
       "status": "pending"
     },
     {
       "id": "AR-46",
-      "summary": "Admin Agent management enhancements: show agent face + last login time; allow Admin to edit/delete agents; ensure approve/reject workflow is fully functional and agents cannot log in until approved.",
-      "reqIds": [],
+      "summary": "Make `getAllAgentProfiles()` return an approval `status` that is consistent with the approval system (UserApproval state), so Admin UI filtering (pending/approved/rejected) works reliably for every agent profile.",
+      "reqIds": [
+        "REQ-34"
+      ],
       "status": "pending"
     },
     {
       "id": "AR-47",
-      "summary": "Add Admin ability to add Leads and Customers from Admin dashboard (create forms similar to Agent, but with admin visibility/control).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-48",
-      "summary": "Admin reporting panel for pending/approved agents and lead/customer statuses, including CSV export (and optional filters).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-49",
-      "summary": "Invoice generation by Admin only, with ability to send invoice via WhatsApp to a Lead or Customer.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-50",
-      "summary": "Admin WhatsApp panel should show consolidated agent-to-lead/customer WhatsApp chat history and call activity logs (visibility across all agents).",
-      "reqIds": [],
+      "summary": "Ensure Admin approval actions update the same underlying agent approval state that is displayed in Admin lists, so approving/rejecting a pending agent immediately moves the agent between Pending and Approved views.",
+      "reqIds": [
+        "REQ-35"
+      ],
       "status": "pending"
     }
   ],
-  "architecturalNotes": [
-    "Plan for role-based access control with separate Admin/Agent dashboards and a shared login entry point that routes by role/approval status.",
-    "Agent onboarding requires face recognition capture and admin approval; store face image for display in admin panel.",
-    "Attendance requires live location/address capture and face authentication at check-in.",
-    "Integrations needed for WhatsApp messaging and phone call initiation from within the app.",
-    "App must support theming and i18n (Hindi/English).",
-    "Seed/initialize default Admin profile details: name 'Vipin Maurya' and mobile number '7217637770' (used for initial admin account/contact info).",
-    "Enforce unique constraint on user mobile numbers (especially Agent accounts) to prevent duplicate registrations; if a mobile number already exists, block registration and direct the user to login (or recovery flow if needed).",
-    "Seed/initialize default Admin profile email id as 'infravrhomes@gmail.com' (in addition to name 'Vipin Maurya' and mobile '7217637770').",
-    "Frontend uses Internet Identity integration hooks (useInternetIdentity/useActor) as part of the authentication flow; ensure II provider requirements remain enforced via lint/build rules.",
-    "Repository now includes a build-template workspace for ICP deployment (canister.yaml configs, deploy.sh, Dockerfile) and scripts for image handling (resize/prune) to standardize builds/releases.",
-    "Frontend UI baseline expanded with shadcn-ui component library files and associated tooling (Tailwind/Vite/ESLint rules) to enforce consistent UI patterns across dashboards.",
-    "Use a dedicated startup gating layer (StartupGate + startup guards) to sequence authentication/actor initialization and prevent long/indeterminate loading states; capture startup timing via startupPerf utilities for diagnostics.",
-    "Maintain and reference a production stabilization runbook (frontend/PRODUCTION_STABILIZATION.md) alongside deployment template/config updates to reduce production deployment failures.",
-    "Require face authentication at both Agent registration and Agent login; block completion if face capture/auth fails.",
-    "Admin Agents panel should display agent face image and login timing/last-login metadata; live/online status should be consistent with session tracking.",
-    "Admin reporting should support CSV export of key entities/statuses (agents pending/approved, leads/customers), optionally with basic filters.",
-    "Admin-only invoice generation and WhatsApp sending flow (invoice delivered to lead/customer via WhatsApp).",
-    "Admin WhatsApp visibility includes consolidated chat/call activity across agents, leads, and customers."
-  ],
-  "knownIssues": [
-    "Production deployment is failing (\"Production deployment failed: Deployment failed\"), preventing the app from going live.",
-    "App is taking too long on the loading page / slow load time reported by user (\"Taking to time on loading page\", \"Not going Live, taking too many time\").",
-    "Agent approval workflow is unreliable: newly registered agents are not appearing as pending/approved in Admin dashboard; approval sync failing.",
-    "Unapproved agents were able to log in (approval gate failing).",
-    "Face capture/authentication was not working reliably; mandatory face capture at registration/login not consistently enforced."
-  ],
-  "isFixRequest": true,
   "gameProjectType": "none",
   "projectName": "VR Homes Infra CRM",
   "clarification_mode": "instant",
-  "clarification_rounds": 0,
-  "requiresBackendChanges": true,
-  "requiresFrontendChanges": true
+  "clarification_rounds": 0
 }
